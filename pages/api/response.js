@@ -18,9 +18,9 @@ export default async function handler(req, res) {
         body: JSON.stringify({input: req.body.input, count: req.body.count})
     }
     const urls = [
-        fetch('http://localhost:3000/api/grammar', fetchOptions),
-        fetch('http://localhost:3000/api/vocab', fetchOptions),
-        fetch('http://localhost:3000/api/relevance', fetchOptions)
+        fetch(process.env.PROD_URL + '/api/grammar', fetchOptions),
+        fetch(process.env.PROD_URL + '/api/vocab', fetchOptions),
+        fetch(process.env.PROD_URL + '/api/relevance', fetchOptions)
     ]
     const responses = await Promise.all(urls);
 
