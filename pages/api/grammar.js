@@ -55,17 +55,15 @@ export default async function handler(req, res) {
     - Verb Tense and Form (30 Points)**: 30/30 (Correct use of the present tense in a declarative sentence)
     - Grammar and Usage (20 Points): 20/20 (All grammatical elements are correctly used)
     - Clarity and Coherence (20 Points): 20/20 (The sentence is clear, coherent, and effectively communicates the statement)
-    - Total: 100/100
+    - Total: 100/100`;    
     
-    Although these examples are based on only a few messages, the entire chat history should be used to evaluate the grammar.`;    const grammarTemplate = ChatPromptTemplate.fromMessages(
+    const grammarTemplate = ChatPromptTemplate.fromMessages(
         [
             ["system", understandingTemplate],
-            new MessagesPlaceholder("history"),
             ["user", "{text}"],
         ]
     )
     const understanding_chain = new ConversationChain({
-        memory: new BufferMemory({ returnMessages: true, memoryKey: "history", inputKey: "text"}),
         prompt: grammarTemplate,
         llm: llm,
     });
