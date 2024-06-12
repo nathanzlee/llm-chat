@@ -49,16 +49,34 @@ export default async function handler(req, res) {
       });
     
     let lexile = req.body.lexile
-    if (relevanceScore.score == 0){
-        lexile = lexile - 200
-    } else if (grammarScore.score < 50){
-        lexile = lexile - 200
-    } else {
-        lexile = lexile + 0.2 * grammarScore.score * vocabScore.score * 2000 / (18 * 100) + 200
-    }
-  
-      lexile = Math.max(lexile,0);
-      lexile = Math.min(lexile,3000);
+    // if (relevanceScore.score == 0){
+    //     lexile = lexile - 200
+    // } else if (grammarScore.score < 50){
+    //     lexile = lexile - 200
+    // } else {
+    //     lexile = lexile + 0.2 * grammarScore.score * vocabScore.score * 2000 / (18 * 100) + 200
+    // }
+    // lexile = Math.max(lexile,0);
+    // lexile = Math.min(lexile,3000);
+
+    // normalize the scores
+    const normalizedVocabScore = vocabScore / 17; // assume 17 is the maximum value of the Coleman-Liau index\
+    const normalizedGrammarScore = grammarScore / 100;
+
+    // define weights for each metric 
+    const vocabWeight = 0.5;
+    const grammarWeight = 0.3;
+    const relevanceWeight = 0.2;
+
+    // calculate the weighted average
+    lexile = (normalizedVocabScore * vocabWeight + normalizedGrammarScore * grammarWeight + relevanceScore * relevanceWeight) * 2000;
+
+
+    // constrain the lexile score to be between 0 and 2000
+    lexile = Math.max(lexile, 0);
+    lexile = Math.min(lexile, 2000);
+    console.log(lexile)
+
     const chat = await main_chain.invoke({text: "Preferred lexile level: ".concat(String(lexile),", text: ",req.body.input) });
     res.status(200).json({ response: chat, lexile: lexile });
     // console.log(grammarScore, vocabScore, relevanceScore)
