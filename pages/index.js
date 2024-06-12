@@ -37,41 +37,75 @@ export default function Home() {
     .then(req => req.json())
     .then(res => {
       console.log(res.response)
-      setConversation(c => [...c, {type: 'reply', msg: res.response}])
+      setConversation(c => [...c, {type: 'reply', msg: res.response, lexile: res.lexile}])
+      console.log(res.lexile)
       setLexile(res.lexile)
       setLoadingResponse(false)
     })
   }
-
-
+  
 
   return (
-    <div className={(conversation.length > 0) ? "w-screen h-screen bg-[#212121] grid grid-rows-[100px_1fr_150px]" : "w-screen h-screen bg-[url('/wave_background.png')] bg-cover grid grid-rows-[100px_1fr_150px]"}>
+    <div className={(conversation.length > 0) ? "w-screen h-screen bg-[#212121] grid grid-rows-[100px_1fr_150px] overflow-hidden" : "w-screen h-screen bg-[url('/wave_background.png')] bg-cover grid grid-rows-[100px_1fr_150px] overflow-hidden"}>
       <div className="flex flex-row justify-between items-center p-4">
         <div><span className="text-[var(--purple)] text-3xl font-extrabold">G</span><span className="text-gray-400 text-3xl">ulu</span><span className="text-[var(--purple)] text-3xl font-extrabold">G</span><span className="text-gray-400 text-3xl">ulu</span></div>
         <div>H</div>
       </div>
-      <div className="h-full">
+      <div className="h-full overflow-auto">
         {
           (conversation.length > 0) ?
           (
             <div className="h-full flex flex-col items-center">
               {
                 conversation.map(c => {
+                  let character
+                  if (c.lexile < 400) {
+                    character = '/cat1.png'
+                  } else if (c.lexile < 800) {
+                    character = '/cat2.png'
+                  } else if (c.lexile < 1200) {
+                    character = '/cat3.png'
+                  } else if (c.lexile < 1600) {
+                    character = '/cat4.png'
+                  } else {
+                    character = '/cat5.png'
+                  }
                   if (c['type'] == 'you') {
                     return (
                       <div className="w-[700px] flex flex-row justify-end">
-                        <div className="text-center rounded-lg bg-[#2F2F2F] text-white p-[15px]">{c.msg}</div>
+                        <div className="text-right rounded-lg bg-[#2F2F2F] text-white p-[15px] max-w-[70%] mb-[20px]">
+                          <span>{c.msg}</span>
+                          {/* <div>Y</div> */}
+                        </div>
                       </div>
                     )
                   } else {
                     return (
-                      <div className="w-[700px] flex flex-row justify-start">
-                        <div className="text-center rounded-lg bg-[#2F2F2F] text-white p-[15px]">{c.msg}</div>
+                      <div className="w-[700px] flex flex-row justify-start items-start">
+                        <Image
+                            src={character}
+                            width={60}
+                            height={60}
+                            alt="Logo"
+                            className="mr-[20px]"
+                          />
+                        <div className="text-left rounded-lg bg-[#2F2F2F] text-white p-[15px] max-w-[80%] mb-[20px]">
+                          <span>{c.msg}</span>
+                        </div>
                       </div>
                     )
                   }
+                  
                 })
+              }
+              {
+                (loadingResponse && (
+                  <div className="w-[700px] flex flex-row justify-start">
+                    <div className="text-left rounded-lg bg-[#2F2F2F] text-white p-[15px] max-w-[70%] mb-[20px]">
+                      <span className="text-4xl">...</span>
+                    </div>
+                  </div>
+                ))
               }
             </div>
           ) :
@@ -108,8 +142,11 @@ export default function Home() {
               autocomplete="one-time-code"
             />
             
+            
+            <svg className={(query !== '' && !loadingResponse) ? "cursor-pointer absolute end-2.5 bottom-2.5 rounded-full bg-white p-[5px]" : "cursor-pointer absolute end-2.5 bottom-2.5 rounded-full bg-[#676767] p-[5px]"} xmlns="http://www.w3.org/2000/svg" width="35" height="35" viewBox="0 0 24 24" fill="none" stroke="#212121" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V6M5 12l7-7 7 7"/>
+            </svg>
+
     
-            <svg className={(query !== '' && !loadingResponse) ? "cursor-pointer absolute end-2.5 bottom-2.5 rounded-full bg-white p-[5px]" : "cursor-pointer absolute end-2.5 bottom-2.5 rounded-full bg-[#676767] p-[5px]"} xmlns="http://www.w3.org/2000/svg" width="35" height="35" viewBox="0 0 24 24" fill="none" stroke="#212121" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V6M5 12l7-7 7 7"/></svg>
             
           </div>
       </form>
